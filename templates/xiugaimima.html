@@ -1,0 +1,371 @@
+{% load static %}
+<!doctype html>
+<html style="overflow-x: hidden; overflow-y: auto;">
+
+<head>
+    <meta charset="utf-8">
+    <title>工作人员</title>
+    <link rel="stylesheet" href="{% static 'style/my.css' %}">
+
+    <link rel="stylesheet" href="{% static 'style/others.css' %}">
+    <link rel="stylesheet" href="{% static 'style/mdui.min.css' %}">
+    <link rel="stylesheet" href="{% static 'style/index.css' %}">
+    <link rel="stylesheet" href="{% static 'style/bulma.min.css' %}">
+
+    <script defer src="{% static 'javascript/all.js' %}"></script>
+    <script src="{% static 'javascript/vue.js' %}"></script>
+    <script src="{% static 'javascript/index.js' %}"></script>
+    <script src="{% static 'javascript/jquery.min.js' %}"></script>
+    <script src="{% static 'javascript/mdui.min.js' %}"></script>
+</head>
+<body>
+<el-container id="table">
+    <el-dialog title="添加人员" :visible.sync="showNewClient">
+        <el-form :model="form" ref="form" :rules="rules">
+            <el-form-item label="人员姓名" :label-width="formLabelWidth" prop="clientname">
+                <el-input v-model="form.clientname" autocomplete="off"></el-input>
+            </el-form-item>
+            <el-form-item label="电话" :label-width="formLabelWidth" prop="tel">
+                <el-input v-model="form.tel" autocomplete="off"></el-input>
+            </el-form-item>
+            <el-form-item label="性别" :label-width="formLabelWidth" prop="gender">
+                <el-select v-model="form.gender" placeholder="请选择活动类型">
+                    <!--{% for activity in activities %}-->
+                    <!--{% endfor %}-->
+                    <el-option label="男" value=0></el-option>
+                    <el-option label="女" value=1></el-option>
+                </el-select>
+            </el-form-item>
+            <el-form-item label="身份号" :label-width="formLabelWidth" prop="id_card">
+                <el-input v-model="form.id_card" autocomplete="off"></el-input>
+            </el-form-item>
+            <el-form-item label="出生日期" :label-width="formLabelWidth" prop="birthday">
+                <!--<el-input v-model="form.activitytime" autocomplete="off"></el-input>-->
+                <el-col :span="11">
+                    <el-date-picker type="date" placeholder="选择日期" v-model="form.birthday" value-format="yyyy-MM-dd"
+                                    style="width: 100%;"></el-date-picker>
+                </el-col>
+            </el-form-item>
+            <el-form-item label="日期" :label-width="formLabelWidth" prop="hire_date">
+                <!--<el-input v-model="form.activitytime" autocomplete="off"></el-input>-->
+                 <el-col :span="11">
+                    <el-date-picker type="date" placeholder="选择日期" v-model="form.hire_date" value-format="yyyy-MM-dd"
+                                    style="width: 100%;"></el-date-picker>
+                </el-col>
+            </el-form-item>
+            <el-form-item label="日期" :label-width="formLabelWidth" prop="resign_date">
+                <!--<el-input v-model="form.activitytime" autocomplete="off"></el-input>-->
+                 <el-col :span="11">
+                    <el-date-picker type="date" placeholder="选择日期" v-model="form.resign_date" value-format="yyyy-MM-dd"
+                                    style="width: 100%;"></el-date-picker>
+                </el-col>
+            </el-form-item>
+
+            <el-form-item label="图像目录" :label-width="formLabelWidth" prop="imgset_dir">
+                <el-input v-model="form.imgset_dir" autocomplete="off"></el-input>
+            </el-form-item>
+            <el-form-item label="头像路径" :label-width="formLabelWidth" prop="profile_photo">
+                <el-input v-model="form.profile_photo" autocomplete="off"></el-input>
+            </el-form-item>
+            <el-form-item label="描述" :label-width="formLabelWidth" prop="DESCRIPTION">
+                <el-input v-model="form.DESCRIPTION" autocomplete="off"></el-input>
+            </el-form-item>
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+            <el-button @click="clear();">重 置</el-button>
+            <el-button type="primary" @click="addClient">提 交</el-button>
+        </div>
+    </el-dialog>
+    <el-dialog title="修改信息" :visible.sync="showEditClient">
+        <el-form :model="form" ref="form" :rules="rules">
+            <el-form-item label="编号" :label-width="formLabelWidth" prop="clientnum">
+                <el-input v-model="form.clientnum" :disabled="true"></el-input>
+            </el-form-item>
+            <el-form-item label="姓名" :label-width="formLabelWidth" prop="clientname">
+                <el-input v-model="form.clientname" ></el-input>
+            </el-form-item>
+            <el-form-item label="性别" :label-width="formLabelWidth" prop="gender">
+                <el-input v-model="form.gender"></el-input>
+            </el-form-item>
+            <el-form-item label="电话" :label-width="formLabelWidth" prop="tel">
+                <el-input v-model="form.tel"></el-input>
+            </el-form-item>
+            <el-form-item label="身份证号" :label-width="formLabelWidth" prop="id_card">
+                <el-input v-model="form.id_card"></el-input>
+            </el-form-item>
+            <el-form-item label="出生日期" :label-width="formLabelWidth" prop="birthday">
+                <el-input v-model="form.birthday"></el-input>
+            </el-form-item>
+            <el-form-item label="入团日期" :label-width="formLabelWidth" prop="hire_date">
+                <el-input v-model="form.hire_date"></el-input>
+            </el-form-item>
+            <el-form-item label="离团日期" :label-width="formLabelWidth" prop="resign_date">
+                <el-input v-model="form.resign_date"></el-input>
+            </el-form-item>
+            <el-form-item label="图像目录" :label-width="formLabelWidth" prop="imgset_dir">
+                <el-input v-model="form.imgset_dir"></el-input>
+            </el-form-item>
+            <el-form-item label="头像路径" :label-width="formLabelWidth" prop="profile_photo">
+                <el-input v-model="form.profile_photo"></el-input>
+            </el-form-item>
+            <el-form-item label="人员描述" :label-width="formLabelWidth" prop="DESCRIPTION">
+                <el-input v-model="form.DESCRIPTION"></el-input>
+            </el-form-item>
+
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+            <el-button @click="clear();">重置修改</el-button>
+            <el-button type="primary" @click="saveRow">提交修改</el-button>
+        </div>
+    </el-dialog>
+    <el-header style="text-align: right; font-size: 12px">
+        <el-row :gutter="20">
+            <el-col :span="8">
+                <el-input
+                        placeholder="搜索"
+                        v-model="search"
+                        size="mini"
+                        clearable>
+                </el-input>
+            </el-col>
+            <el-col :span="16">
+                <el-button icon="el-icon-circle-plus-outline" @click="showNewClient=true">添加</el-button>
+            </el-col>
+        </el-row>
+    </el-header>
+    <el-table ref="filterTable"
+              :data="tableData.filter(data => !search || data.clientname.toLowerCase().includes(search.toLowerCase()))"
+              style="width: 100%">
+
+        <el-table-column
+                prop="clientnum" label="原密码" sortable align="center">
+        </el-table-column>
+
+        <el-table-column
+                prop="clientname" label="新密码" align="center">
+        </el-table-column>
+
+        <el-table-column
+                prop="tel" label="重复新密码" align="center">
+        </el-table-column>
+
+        <el-table-column align="center">
+                <div slot-scope="scope">
+                <input type="text" name="1" align="center"/>
+                <el-button size="mini" type="primary" style="margin-left: 0px;"
+                           @click="deleteRow(scope.row,scope.$index)">修改密码
+                </el-button>
+                </div>
+        </el-table-column>
+    </el-table>
+</el-container>
+
+</body>
+<script>
+    var vue = new Vue({
+        delimiters: ['[[', ']]'],
+        el: '#table',
+        created: function () {
+            // 页面刚被渲染时向后端发送ajax请求数据  解析json后放入vue的变量tableData里
+            $.ajax({
+                url: "/Employee",
+                type: "POST",
+                data: {"type": "init"},
+                success: function (data1) {
+                    let clients = data1.clients;
+                    for (var i = 0; i < clients.length; i++) {
+
+                        vue.tableData.push(
+                            {
+
+                            }
+                        );
+                    }
+                }
+            });
+        },
+        data() {
+            var validateTel = (rule, value, callback) => {
+                /*if (!(/^1(3|4|5|7|8)\d{9}$/.test(value))) {
+                    callback(new Error('手机号码有误，请重新输入！'));
+                }
+                else {
+                    callback();
+                }*/
+                callback();
+            };
+
+            return {
+                search: '',
+                fd: '',
+                formLabelWidth: '100px',
+                tableData: [],
+                showNewClient: false,
+                showEditClient: false,
+                form: {
+                    clientnum: '',
+                    clientname: '',
+                    gender: '',
+                    tel: '',
+                    id_card: '',
+                    birthday: '',
+                    hire_date: '',
+                    resign_date: '',
+                    imgset_dir: '',
+                    profile_photo: '',
+                    DESCRIPTION: '',
+                },
+                rules: {
+                    clientname: [{required: true, message: '请输入工作人员名', trigger: 'blur'}], //工作人员名
+                    gender: [{required: true, message: '请选择性别', trigger: 'blur'}],
+
+                    tel: [
+                        {required: true, message: '不可为空！', trigger: 'blur'},
+                    ],
+
+                    id_card: [{required: true, message: '请输入身份证号', trigger: 'blur'}],
+                    birthday: [{required: true, message: '请输入出生日期', trigger: 'blur'}],
+                    hire_date: [{required: true, message: '请输入入职日期', trigger: 'blur'}],
+                    resign_date: [{required: true, message: '请输离职日期', trigger: 'blur'}],
+                    imgset_dir: [{required: true, message: '请输入图像目录', trigger: 'blur'}],
+                    profile_photo: [{required: true, message: '请输入头像路径', trigger: 'blur'}],
+                    DESCRIPTION: [{required: true, message: '请输入工作人员描述', trigger: 'blur'}],
+
+                },
+            }
+        },
+        methods: {
+            ifendcase(val){
+
+            },
+
+            addClient() {
+                this.$refs['form'].validate((valid) => {
+                    if (valid) {
+                        vue.fd = new FormData();
+                        vue.fd.append("type", "add");
+                        vue.fd.append("clientname", this.form.clientname);
+                        vue.fd.append("gender", this.form.gender);
+                        vue.fd.append("tel", this.form.tel);
+                        vue.fd.append("id_card", this.form.id_card);
+                        vue.fd.append("birthday", this.form.birthday);
+                        vue.fd.append("hire_date", this.form.hire_date);
+                        vue.fd.append("resign_date", this.form.resign_date);
+                        vue.fd.append("imgset_dir", this.form.imgset_dir);
+                        vue.fd.append("profile_photo", this.form.profile_photo);
+                        vue.fd.append("DESCRIPTION", this.form.DESCRIPTION);
+                        $.ajax({
+                            url: "/Employee",
+                            type: "POST",
+                            processData: false,
+                            contentType: false,
+                            data: vue.fd
+                            ,
+                            success: function (data1) {
+                                if(data1.msg == "success"){
+                                   vue.$message.success('工作人员添加成功！');
+                                    window.location.href = "";
+                                }
+                                else{
+                                    vue.$message.error('工作人员已存在！');
+                                }
+
+                            }
+                        })
+                    } else {
+                        return false;
+                    }
+                });
+            },
+            clear() {
+                vue.$confirm('此操作将清空此工作人员所有信息, 是否继续?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    this.form.clientname = '';
+                    this.form.gender = '';
+                    this.form.tel = '';
+                    this.form.id_card = '';
+                    this.form.birthday = '';
+                    this.form.hire_date = '';
+                    this.form.resign_date = '';
+                    this.form.imgset_dir = '';
+                    this.form.profile_photo = '';
+                    this.form.DESCRIPTION = '';
+                }).catch(() => {
+                    this.$message({
+                        type: 'info',
+                        message: '已取消清空'
+                    });
+                });
+            },
+            deleteRow(tempRow, order) {
+                vue.$confirm('此操作将永久删除该工作人员, 是否继续?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    vue.fd = new FormData();
+                    vue.fd.append("type", "delete");
+                    vue.fd.append("clientnum", tempRow.clientnum);
+                    $.ajax({
+                        url: "/Employee",
+                        type: "POST",
+                        processData: false,
+                        contentType: false,
+                        data: vue.fd,
+                        success: function () {
+                            vue.$message.success('删除成功！');
+                            vue.tableData.splice(order, 1);
+                        }
+                    })
+                }).catch(() => {
+                    this.$message({
+                        type: 'info',
+                        message: '已取消删除'
+                    });
+                });
+            },
+            editRow(row) {
+                this.form = row;
+                this.showEditClient = true;
+            },
+            saveRow() {
+                this.$refs['form'].validate((valid) => {
+                    if (valid) {
+                        vue.fd = new FormData();
+                        vue.fd.append("type", "save");
+                        vue.fd.append("clientnum", this.form.clientnum);
+                        vue.fd.append("clientname", this.form.clientname);
+                        vue.fd.append("gender", this.form.gender);
+                        vue.fd.append("tel", this.form.tel);
+                        vue.fd.append("id_card", this.form.id_card);
+                        vue.fd.append("birthday", this.form.birthday);
+                        vue.fd.append("hire_date", this.form.hire_date);
+                        vue.fd.append("resign_date", this.form.resign_date);
+                        vue.fd.append("imgset_dir", this.form.imgset_dir);
+                        vue.fd.append("profile_photo", this.form.profile_photo);
+                        vue.fd.append("DESCRIPTION", this.form.DESCRIPTION);
+                        $.ajax({
+                            url: "/Employee",
+                            type: "POST",
+                            processData: false,
+                            contentType: false,
+                            data: vue.fd ,
+                            success: function (data1) {
+                                if (data1.msg == "success") {
+                                    vue.$message.success('修改成功');
+                                    window.location.href="";
+                                }
+                            }
+                        })
+                    } else {
+                        return false;
+                    }
+                });
+            },
+        }
+    })
+</script>
+</html>

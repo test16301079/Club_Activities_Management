@@ -1,0 +1,532 @@
+{% load static %}
+<!doctype html>
+<html style="overflow-x: hidden; overflow-y: auto;">
+
+<head>
+    <meta charset="utf-8">
+    <title>全部申请</title>
+    <link rel="stylesheet" href="{% static 'style/my.css' %}">
+
+    <link rel="stylesheet" href="{% static 'style/others.css' %}">
+    <link rel="stylesheet" href="{% static 'style/mdui.min.css' %}">
+    <link rel="stylesheet" href="{% static 'style/index.css' %}">
+    <link rel="stylesheet" href="{% static 'style/bulma.min.css' %}">
+
+    <script defer src="{% static 'javascript/all.js' %}"></script>
+    <script src="{% static 'javascript/vue.js' %}"></script>
+    <script src="{% static 'javascript/index.js' %}"></script>
+    <script src="{% static 'javascript/jquery.min.js' %}"></script>
+    <script src="{% static 'javascript/mdui.min.js' %}"></script>
+</head>
+<body>
+<el-container id="table">
+    <el-dialog title="申请分配信息" :visible.sync="showContractInfo">
+        <el-form :model="form" ref="form" :rules="rules">
+            <el-form-item label="活动名" :label-width="formLabelWidth" prop="activityname">
+                <el-input v-model="form.activityname" autocomplete="off"></el-input>
+            </el-form-item>
+            <!--<el-form-item label="活动类型" :label-width="formLabelWidth" prop="activitytype">-->
+                <!--<el-input v-model="form.activitytype" autocomplete="off"></el-input>-->
+            <!--</el-form-item>-->
+            <el-form-item label="活动类型" :label-width="formLabelWidth" prop="activitytype">
+                <el-select v-model="form.activitytype" placeholder="请选择活动类型">
+                    <!--{% for activity in activities %}-->
+                    <!--{% endfor %}-->
+                    <el-option label="学术类" value=0></el-option>
+                    <el-option label="体育类" value=1></el-option>
+                    <el-option label="科技类" value=2></el-option>
+                    <el-option label="文化类" value=3></el-option>
+                </el-select>
+            </el-form-item>
+
+            <el-form-item label="活动时间" :label-width="formLabelWidth" prop="activitytime">
+                <!--<el-input v-model="form.activitytime" autocomplete="off"></el-input>-->
+                <el-col :span="11">
+                    <el-date-picker type="date" placeholder="选择日期" v-model="form.activitytime" value-format="yyyy-MM-dd"
+                                    style="width: 100%;"></el-date-picker>
+                </el-col>
+            </el-form-item>
+            <el-form-item label="报名时间" :label-width="formLabelWidth" prop="openenrolltime">
+                <!--<el-input v-model="form.openenrolltime" autocomplete="off"></el-input>-->
+                <el-col :span="11">
+                    <el-date-picker type="date" placeholder="选择日期" v-model="form.openenrolltime" value-format="yyyy-MM-dd"
+                                    style="width: 100%;"></el-date-picker>
+                </el-col>
+            </el-form-item>
+            <el-form-item label="活动容量" :label-width="formLabelWidth" prop="activitycapacity">
+                <el-input v-model="form.activitycapacity" autocomplete="off"></el-input>
+            </el-form-item>
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+            <el-button @click="clear();">重 置</el-button>
+            <el-button type="primary" @click="addClient">提 交</el-button>
+        </div>
+    </el-dialog>
+    <!--<el-dialog title="查看申请内容" :visible.sync="showContract">-->
+        <!--<el-form>-->
+            <!--<el-row :gutter="20">-->
+                <!--<el-col :span="12">-->
+                    <!--<el-form-item label="申请号" :label-width="formLabelWidth">-->
+                        <!--<span>[[ focusContract.activityid ]]</span>-->
+                    <!--</el-form-item>-->
+                <!--</el-col>-->
+                <!--<el-col :span="12">-->
+                    <!--<el-form-item label="申请名称" :label-width="formLabelWidth">-->
+                        <!--<span>[[ focusContract.activityname ]]</span>-->
+                    <!--</el-form-item>-->
+                <!--</el-col>-->
+            <!--</el-row>-->
+            <!--<el-row :gutter="20">-->
+                <!--<el-col :span="12">-->
+                    <!--<el-form-item label="申请人" :label-width="formLabelWidth">-->
+                        <!--<span>[[ focusContract.draft ]]</span>-->
+                    <!--</el-form-item>-->
+                <!--</el-col>-->
+                <!--<el-col :span="12">-->
+                    <!--<el-form-item label="场地名" :label-width="formLabelWidth">-->
+                        <!--<span>[[ focusContract.activitytype ]]</span>-->
+                    <!--</el-form-item>-->
+                <!--</el-col>-->
+            <!--</el-row>-->
+            <!--<el-row :gutter="20">-->
+                <!--<el-col :span="12">-->
+                    <!--<el-form-item label="开始时间" :label-width="formLabelWidth">-->
+                        <!--<span>[[ focusContract.begintime ]]</span>-->
+                    <!--</el-form-item>-->
+                <!--</el-col>-->
+                <!--<el-col :span="12">-->
+                    <!--<el-form-item label="结束时间" :label-width="formLabelWidth">-->
+                        <!--<span>[[ focusContract.endtime ]]</span>-->
+                    <!--</el-form-item>-->
+                <!--</el-col>-->
+            <!--</el-row>-->
+            <!--<el-form-item label="申请内容" :label-width="formLabelWidth">-->
+                <!--<el-input type="textarea" autosize placeholder=" focusContract.content"-->
+                          <!--v-model="focusContract.content" :disabled="true"></el-input>-->
+            <!--</el-form-item>-->
+            <!--<el-form-item label="附件" :label-width="formLabelWidth">-->
+                        <!--<span v-if="focusContract.file=='true'">-->
+                            <!--<el-button type="text" @click="download(focusContract.activityid)">下载</el-button>-->
+                        <!--</span>-->
+                <!--<span v-else>-->
+                            <!--无-->
+                        <!--</span>-->
+            <!--</el-form-item>-->
+        <!--</el-form>-->
+        <!--<div slot="footer" class="dialog-footer">-->
+            <!--<el-button @click="showContract = false">我看完啦</el-button>-->
+        <!--</div>-->
+    <!--</el-dialog>-->
+    <el-header style="text-align: right; font-size: 12px">
+        <el-row>
+            <el-col :span="8">
+                <el-input placeholder="输入申请名搜索" v-model="search" size="mini" clearable></el-input>
+            </el-col>
+            <el-col :span="16">
+                <el-button icon="el-icon-circle-plus-outline" @click="showContractInfo=true">添加活动</el-button>
+                <el-button @click="resetFilter">取消筛选</el-button>
+            </el-col>
+        </el-row>
+    </el-header>
+    <el-table ref="filterTable"
+              :data="tableData.filter(data => !search || data.activityname.toLowerCase().includes(search.toLowerCase()))"
+              style="width: 100%">
+        <el-table-column type="expand">
+            <div slot-scope="c">
+                <el-form label-position="left" inline class="demo-table-expand">
+                    <el-form-item label="申请名称">
+                        <span>[[ c.row.activityname ]]</span>
+                    </el-form-item>
+                    <el-form-item label="场地名">
+                        <span>[[ c.row.activitytype ]]</span>
+                    </el-form-item>
+                    <el-form-item label="状态">
+                        <span>[[ c.row.state ]]</span>
+                    </el-form-item>
+                    <el-form-item label="申请内容">
+                        <el-button icon="el-icon-search" circle size="small"
+                                   @click="showContractOpen(c.row)"></el-button>
+                    </el-form-item>
+                    <el-form-item label="附件"
+                                  v-show="c.row.stateNum!='2'">
+                        <span v-if="c.row.file=='true'">
+                            <el-button type="text" @click="download(c.row.activityid)">下载</el-button>
+                        </span>
+                        <span v-else>
+                            无
+                        </span>
+                    </el-form-item>
+                    <el-form-item label="会签信息"
+                                  v-show="c.row.stateNum=='1'||c.row.stateNum=='2'||c.row.stateNum=='3'||c.row.stateNum=='4'||c.row.stateNum=='5'||c.row.stateNum=='-1'">
+                        <el-button icon="el-icon-search" circle size="small"
+                                   @click="showContractInfoOpen(c.row,'1')"></el-button>
+                    </el-form-item>
+                    <el-form-item label="审批信息"
+                                  v-show="c.row.stateNum=='3'||c.row.stateNum=='4'||c.row.stateNum=='5'||c.row.stateNum=='-1'">
+                        <el-button icon="el-icon-search" circle size="small"
+                                   @click="showContractInfoOpen(c.row,'2')"></el-button>
+                    </el-form-item>
+                    <el-form-item label="签订信息" v-show="c.row.stateNum=='4'||c.row.stateNum=='5'">
+                        <el-button icon="el-icon-search" circle size="small"
+                                   @click="showContractInfoOpen(c.row,'3')"></el-button>
+                    </el-form-item>
+
+                </el-form>
+            </div>
+        </el-table-column>
+        <el-table-column label="活动ID" prop="activityid" sortable align="center"></el-table-column>
+        <el-table-column label="活动名称" prop="activityname" align="center"></el-table-column>
+        <el-table-column label="活动类型" prop="activitytype" align="center"
+                         :formatter="ifendcase"
+                         :filters="[{ text: '学术类', value: ['0'] },{ text: '体育类', value: ['1'] }, { text: '科技类', value: ['2'] }, { text: '文化类', value: ['3'] }  ]"
+                         :filter-method="filterTag_activitytype"
+                         filter-placement="bottom-end">
+
+        </el-table-column>
+        <el-table-column label="开始时间" prop="activitytime" sortable align="center"></el-table-column>
+        <el-table-column label="活动容量" prop="activitycapacity" sortable align="center"></el-table-column>
+        <el-table-column label="报名时间" prop="openenrolltime" sortable align="center"></el-table-column>
+        <el-table-column prop="state" label="报名状态" sortable align="center" column-key="stateNum"
+                         :formatter="ifendcase"
+                         :filters="[{ text: '审批未通过', value: ['-1'] },{ text: '会签中', value: ['1'] }, { text: '审批中', value: ['2'] }, { text: '签订中', value: ['3'] }, { text: '签订完成', value: ['4'] } ]"
+                         :filter-method="filterTag_stateNum"
+                         filter-placement="bottom-end">
+            <div slot-scope="scope">
+                <el-tag
+                        v-show="scope.row.stateNum=='-1' "
+                        type="danger"
+                        disable-transitions>[[scope.row.state]]
+                </el-tag>
+                <el-tag
+                        v-show="scope.row.stateNum!='-1' "
+                        disable-transitions>[[scope.row.state]]
+                </el-tag>
+            </div>
+        </el-table-column>
+        <el-table-column>
+            <div slot-scope="scope">
+                <el-button size="mini" type="primary" style="margin-left: 0px;"
+                           @click="deleteRow(scope.row,scope.$index)">删除
+                </el-button>
+                <el-button size="mini" type="primary" style="margin-left: 0px;"
+                           @click="editRow(scope.row)">修改
+                </el-button>
+
+            </div>
+        </el-table-column>
+    </el-table>
+</el-container>
+</body>
+<script>
+    var vue = new Vue({
+        delimiters: ['[[', ']]'],
+        el: '#table',
+        created: function () {
+            // 页面刚被渲染时向后端发送ajax请求数据  解析json后放入vue的变量tableData里
+            $.ajax({
+                url: "/allActivity",
+                type: "POST",
+                data: {"type": "init"},
+                success: function (data1) {
+                    var activities = data1.activities;
+                    for (var i = 0; i < activities.length; i++) {
+                        let activity = activities[i];
+                        vue.tableData.push(
+                            {
+                                activityid: activity.activityid, //申请号
+                                activityname: activity.activityname, //申请名
+                                activitytype: activity.activitytype, //场地名
+                                activitytime: activity.activitytime, //开始时间
+                                activitycapacity: activity.activitycapacity,//活动容量
+                                openenrolltime: activity.openenrolltime, //报名时间
+
+                                stateNum: activity.stateNum, //状态编号
+                                state: activity.state,//状态
+                                draft: activity.draft,//申请人
+                                content: activity.content, //申请内容
+                                file: activity.file //文件是否存在
+                            }
+                        );
+                    }
+
+                }
+            })
+        },
+        data() {
+            return {
+                showContractInfo: false,
+                activeName: '1',
+                contractInfo: [],
+                tableData: [],
+                formLabelWidth: '100px',
+                showContract: false,
+                focusContract: '',
+                search: '',
+                fd: '',
+                form: {
+                    activityname: '',
+                    activitytype: '',
+                    activitytime: '',
+                    openenrolltime: '',
+                    activitycapacity: '',
+                },
+                rules: {
+                    activityname: [{required: true, message: '请输入场地名', trigger: 'blur'}], //场地名
+                    activitytime: [{required: true, message: '不可为空！', trigger: 'blur'},],
+                    activitytype: [{required: true, message: '不可为空！', trigger: 'blur'},],
+                    openenrolltime: [{required: true, message: '不可为空！', trigger: 'blur'},],
+                    activitycapacity: [{required: true, message: '不可为空！', trigger: 'blur'},],
+
+                    addition: [{required: true, message: '请输入场地描述', trigger: 'blur'}],
+                },
+            }
+        },
+        methods: {
+            ifendcase(val){
+                console.log("aaaaaa");
+                console.log(val.activitytype);
+                if(val.activitytype == '0')
+                {return "学术类"}
+                else if (val.activitytype == '1')
+                {return "体育类"}
+                else if (val.activitytype == '2')
+                {return "科技类"}
+                else if (val.activitytype == '3')
+                {return "文化类"}
+                else
+                {return val.activitytype}
+            },
+            resetFilter() {
+                this.$refs.filterTable.clearFilter('activitytype');
+            },
+            filterTag_stateNum(values, row) {
+                for (var i = 0; i < values.length; i++) {
+                    let value = values[i];
+                    if (row.stateNum === value)
+                        return true;
+                }
+                return false;
+            },
+            filterTag_activitytype(values, row) {
+                for (var i = 0; i < values.length; i++) {
+                    let value = values[i];
+                    if (row.activitytype === value)
+                        return true;
+                }
+                return false;
+            },
+            filterHandler(value, row, column) {
+                const property = column['property'];
+                return row[property] === value;
+            },
+            download(activityid) {
+                var form = $("<form>");//定义一个form表单
+                form.attr("style", "display:none");
+                form.attr("target", "");
+                form.attr("method", "post"); //请求类型
+                form.attr("action", "/downloadFile"); //请求地址
+                var sql = $("<input>");
+                sql.attr("type", "hidden");
+                sql.attr("name", "activityid");
+                sql.attr("value", activityid);
+                form.append(sql);
+                $(document.body).append(form)
+                form.submit()
+            },
+            baomingRow(tempRow,order) {
+                vue.$confirm('确定报名吗?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    vue.fd = new FormData();
+                    vue.fd.append("type", "enroll");
+                    vue.fd.append("activityid", tempRow.activityid);
+                    $.ajax({
+                        url: "/allActivity",
+                        type: "POST",
+                        processData: false,
+                        contentType: false,
+                        data: vue.fd,
+                        success: function () {
+                            vue.$message.success('报名成功！');
+                            //vue.tableData.splice(order, 1);
+                        }
+                    })
+                }).catch(() => {
+                    this.$message({
+                        type: 'info',
+                        message: '已取消报名'
+                    });
+                });
+            },
+            showContractInfoOpen(row, activeName) {
+                this.activeName = activeName;
+                this.showContractInfo = true;
+                $.ajax({
+                    url: "/allContract",
+                    type: "POST",
+                    data: {"type": "info", "activityid": row.activityid},
+                    success: function (data1) {
+                        var cInfo = data1.cInfo;
+                        vue.contractInfo =
+                            {
+                                activityid: cInfo.activityid,
+                                countersign: [
+                                    {
+                                        countersignPerson: cInfo.countersign1,
+                                        opinion: cInfo.copinion1,
+                                        ctime: cInfo.ctime1,
+                                    }, {
+                                        countersignPerson: cInfo.countersign2,
+                                        opinion: cInfo.copinion2,
+                                        ctime: cInfo.ctime2,
+                                    }, {
+                                        countersignPerson: cInfo.countersign3,
+                                        opinion: cInfo.copinion3,
+                                        ctime: cInfo.ctime3,
+                                    }
+                                ],
+                                approval: [{
+                                    approvalPerson: cInfo.approval1,
+                                    astate: cInfo.astate1,
+                                    opinion: cInfo.aopinion1,
+                                    atime: cInfo.atime1,
+                                }, {
+                                    approvalPerson: cInfo.approval2,
+                                    astate: cInfo.astate2,
+                                    opinion: cInfo.aopinion2,
+                                    atime: cInfo.atime2,
+                                }, {
+                                    approvalPerson: cInfo.approval3,
+                                    astate: cInfo.astate3,
+                                    opinion: cInfo.aopinion3,
+                                    atime: cInfo.atime3,
+                                }],
+                                sign: [{
+                                    signPerson: cInfo.sign,
+                                    sinformation: cInfo.sinformation,
+                                    stime: cInfo.stime,
+                                }],
+                            }
+                    }
+                })
+            },
+            addClient() {
+                this.$refs['form'].validate((valid) => {
+                    if (valid) {
+                        vue.fd = new FormData();
+                        vue.fd.append("type", "add");
+                        vue.fd.append("activityname", this.form.activityname);
+                        vue.fd.append("activitytype", this.form.activitytype);
+                        vue.fd.append("activitytime", this.form.activitytime);
+                        vue.fd.append("openenrolltime", this.form.openenrolltime);
+                        vue.fd.append("activitycapacity", this.form.activitycapacity);
+
+                        $.ajax({
+                            url: "/allActivity",
+                            type: "POST",
+                            processData: false,
+                            contentType: false,
+                            data: vue.fd
+                            ,
+                            success: function (data1) {
+                                if(data1.msg == "success"){
+                                   vue.$message.success('活动添加成功！');
+                                    window.location.href = "";
+                                }
+                                else{
+                                    vue.$message.error('活动已存在！');
+                                }
+
+                            }
+                        })
+                    } else {
+                        return false;
+                    }
+                });
+            },
+            clear() {
+                vue.$confirm('此操作将清空此项所有信息, 是否继续?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    this.form.clientname = '';
+                    this.form.tel = '';
+
+                    this.form.addition = '';
+                }).catch(() => {
+                    this.$message({
+                        type: 'info',
+                        message: '已取消清空'
+                    });
+                });
+            },
+            deleteRow(tempRow, order) {
+                vue.$confirm('此操作将永久删除该项, 是否继续?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    vue.fd = new FormData();
+                    vue.fd.append("type", "delete");
+                    vue.fd.append("clientnum", tempRow.clientnum);
+                    $.ajax({
+                        url: "/myField",
+                        type: "POST",
+                        processData: false,
+                        contentType: false,
+                        data: vue.fd,
+                        success: function () {
+                            vue.$message.success('删除成功！');
+                            vue.tableData.splice(order, 1);
+                        }
+                    })
+                }).catch(() => {
+                    this.$message({
+                        type: 'info',
+                        message: '已取消删除'
+                    });
+                });
+            },
+            editRow(row) {
+                this.form = row;
+                this.showEditClient = true;
+            },
+            saveRow() {
+                this.$refs['form'].validate((valid) => {
+                    if (valid) {
+                        vue.fd = new FormData();
+                        vue.fd.append("type", "save");
+                        vue.fd.append("clientnum", this.form.clientnum);
+                        vue.fd.append("tel", this.form.tel);
+
+                        vue.fd.append("addition", this.form.addition);
+                        $.ajax({
+                            url: "/myField",
+                            type: "POST",
+                            processData: false,
+                            contentType: false,
+                            data: vue.fd
+                            ,
+                            success: function (data1) {
+                                if (data1.msg == "success") {
+                                    vue.$message.success('修改成功');
+                                    window.location.href="";
+                                }
+                            }
+                        })
+                    } else {
+                        return false;
+                    }
+                });
+            },
+            showContractOpen(row) {
+                this.focusContract = row;
+                this.showContract = true;
+            },
+        }
+    })
+</script>
+</html>

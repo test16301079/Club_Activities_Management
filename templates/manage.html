@@ -1,0 +1,282 @@
+{% load static %}
+<!doctype html>
+<html  style="overflow-x: hidden; overflow-y: auto;">
+
+<head>
+    <meta charset="utf-8">
+    <title>Manage</title>
+
+    <link rel="stylesheet" href="{% static 'style/my.css' %}">
+
+    <link rel="stylesheet" href="{% static 'style/others.css' %}">
+    <link rel="stylesheet" href="{% static 'style/mdui.min.css' %}">
+    <link rel="stylesheet" href="{% static 'style/index.css' %}">
+    <link rel="stylesheet" href="{% static 'style/bulma.min.css' %}">
+
+    <script defer src="{% static 'javascript/all.js' %}"></script>
+    <script src="{% static 'javascript/vue.js' %}"></script>
+    <script src="{% static 'javascript/index.js' %}"></script>
+    <script src="{% static 'javascript/jquery.min.js' %}"></script>
+    <script src="{% static 'javascript/mdui.min.js' %}"></script>
+</head>
+
+<body>
+<div id="index">
+    <nav class="navbar is-transparent">
+        <div class="navbar-brand">
+            <a class="navbar-item" @click="isCollapse=!isCollapse">
+                <img src="{% static 'image/safari.png' %}" alt="contact_system" width="30" height="40">
+            </a>
+        </div>
+        <div id="navbarExampleTransparentExample" class="navbar-menu">
+            <div class="navbar-end">
+                <div class="navbar-item">
+                    <el-badge :value="gridData.length" class="item">
+                        <el-popover
+                                placement="bottom"
+                                width="400"
+                                trigger="click">
+                            <el-table :data="gridData">
+                                <el-table-column width="100" property="contractnum" label="留言"></el-table-column>
+                                <el-table-column width="100" property="mission" label="回复"></el-table-column>
+                                <el-table-column>
+                                    <div slot-scope="scope">
+                                        <el-button size="mini" type="primary" style="margin-left: 0px;"
+                                                   v-show="scope.row.missionnum=='0'"
+                                                   @click="goto('1-3',scope.row,scope.$index)">管理员留言
+                                        </el-button>
+                                        <el-button size="mini" type="primary" style="margin-left: 0px;"
+                                                   v-show="scope.row.missionnum=='1'"
+                                                   @click="goto('1-2',scope.row)">管理员留言
+                                        </el-button>
+                                        <el-button size="mini" type="primary" style="margin-left: 0px;"
+                                                   v-show="scope.row.missionnum=='2'"
+                                                   @click="goto('1-1',scope.row)">管理员留言
+                                        </el-button>
+                                        <el-button size="mini" type="primary" style="margin-left: 0px;"
+                                                   v-show="scope.row.missionnum=='3'"
+                                                   @click="goto('1-2',scope.row)">管理员留言
+                                        </el-button>
+                                        <el-button size="mini" type="primary" style="margin-left: 0px;"
+                                                   v-show="scope.row.missionnum=='4'"
+                                                   @click="goto('1-2',scope.row)">管理员留言
+                                        </el-button>
+                                    </div>
+                                </el-table-column>
+                                <el-table-column>
+                                    <div slot-scope="scope">
+                                        <el-button size="mini" type="success" style="margin-left: 0px;"
+                                                   @click="handleDelete(scope.row,scope.$index)">知道了
+                                        </el-button>
+                                    </div>
+                                </el-table-column>
+                            </el-table>
+                            <el-button icon="el-icon-bell" circle size="small" slot="reference"></el-button>
+                        </el-popover>
+                    </el-badge>
+                </div>
+                <div class="navbar-item">
+                    <p>欢迎回来，{{ username }}</p>
+                </div>
+                <div class="navbar-item">
+                    <el-button type="text" @click="logout">
+                                    <span>
+                                        注销
+                                    </span>
+                    </el-button>
+
+                </div>
+
+            </div>
+        </div>
+    </nav>
+
+
+    <el-container v-bind:style="{border: '1px solid #eee', height:myheight}">
+        <el-menu default-active="1-4-1" class="el-menu-vertical-demo" @open="handleOpen" @close="handleClose"
+                 :collapse="!isCollapse">
+
+            <el-menu-item id="2" index="2" @click="setiframeScr('guanli')">
+                <i class="mdui-icon material-icons">&#xe85e;</i>
+                <span slot="title">账号管理</span>
+            </el-menu-item>
+            <el-submenu id="3" index="3">
+                <template slot="title">
+                    <i class="mdui-icon material-icons">&#xe87c;</i>
+                    <span slot="title">社团信息</span>
+                </template>
+                <el-menu-item id="3-1" index="3-1" data-target="#assignment" @click="setiframeScr('Employee')">
+                    <i class="el-icon-service"></i>
+                    社团信息详情
+                </el-menu-item>
+                <el-menu-item id="3-2" index="3-2" data-target="#assignment1" @click="setiframeScr('datasetlink_old')">
+                    <i class="el-icon-news"></i>
+                    统计数据
+                </el-menu-item>
+            </el-submenu>
+            <el-submenu id="4" index="4">
+                <template slot="title">
+                    <i class="mdui-icon material-icons">&#xe87c;</i>
+                    <span slot="title">社团活动信息</span>
+                </template>
+                <el-menu-item id="4-1" index="4-1" data-target="#assignment" @click="setiframeScr('Employee')">
+                    <i class="el-icon-service"></i>
+                    社团活动预告
+                </el-menu-item>
+                <el-menu-item id="4-2" index="4-2" data-target="#assignment1" @click="setiframeScr('datasetlink')">
+                    <i class="el-icon-news"></i>
+                    社团活动成果
+                </el-menu-item>
+            </el-submenu>
+            <el-submenu id="5" index="5">
+                <template slot="title">
+                    <i class="mdui-icon material-icons">&#xe85c;</i>
+                    <span slot="title">社团招新信息</span>
+                </template>
+                <el-menu-item id="5-1" index="5-1" data-target="#assignment" @click="setiframeScr('allActivity')">
+                    <i class="el-icon-service"></i>
+                    最新招新信息
+                </el-menu-item>
+                <el-menu-item id="5-2" index="5-2" data-target="#assignment1" @click="setiframeScr('datasetlink_vol')">
+                    <i class="el-icon-news"></i>
+                    招新信息统计
+                </el-menu-item>
+            </el-submenu>
+            <el-menu-item id="6" index="6" @click="setiframeScr('myActivity')">
+                <i class="mdui-icon material-icons">&#xe86d;</i>
+                <span slot="title">活动安排</span>
+            </el-menu-item>
+            <el-menu-item id="7" index="7" @click="setiframeScr('myActivity')">
+                <i class="mdui-icon material-icons">&#xe86d;</i>
+                <span slot="title">场地申请</span>
+            </el-menu-item>
+            {#            <el-menu-item index="5" @click="setiframeScr('log')">#}
+            {#                <i class="mdui-icon material-icons">&#xe86d;</i>#}
+            {#                <span slot="title">日志</span>#}
+            {#            </el-menu-item>#}
+        </el-menu>
+
+
+        <el-container>
+            <iframe v-if="iframeScr!=''" :src="iframeScr" height="100%" width="100%"></iframe>
+            <iframe v-else :src="'role'" height="100%" width="100%" ></iframe>
+        </el-container>
+    </el-container>
+    </el-container>
+</div>
+</body>
+
+
+<script>
+    var index = new Vue({
+        delimiters: ['[[', ']]'],
+        el: '#index',
+        created: function () {
+            this.setmyheight();
+            $.ajax({
+                url: "/manage",
+                type: "POST",
+                success: function (data1) {
+                    index.role.fun1 = data1.fun1;
+                    index.role.fun2 = data1.fun2;
+                    index.role.fun3 = data1.fun3;
+                    index.role.fun4 = data1.fun4;
+                    index.role.fun5 = data1.fun5;
+                    index.role.fun6 = data1.fun6;
+                    let news = data1.news;
+                    for (var i = 0; i < news.length; i++) {
+                        let newmessage = news[i];
+                        index.gridData.push(
+                            {
+                                id: newmessage.id,
+                                contractnum: newmessage.contractnum, //申请号
+                                missionnum: newmessage.missionnum,//0   1    2     3     4
+                                mission: newmessage.mission,//   留言程序
+                            }
+                        );
+                    }
+                }
+            });
+        },
+        data() {
+            return {
+                isCollapse: true,
+                iframeScr: '',
+                myheight: '',
+                role: {
+                    fun1: false,
+                    fun2: false,
+                    fun3: false,
+                    fun4: false,
+                    fun5: false,
+                    fun6: false,
+                },
+                gridData: []
+            };
+        },
+        methods: {
+            handleOpen(key, keyPath) {
+                console.log(key, keyPath);
+            },
+            handleClose(key, keyPath) {
+                console.log(key, keyPath);
+            },
+            setiframeScr(scr) {
+
+                this.iframeScr = scr;
+            },
+            setmyheight() {
+                this.myheight = window.innerHeight - 60 + 'px';
+            },
+            logout() {
+                window.location.href = "/logout";
+            },
+            handleDelete(tempRow, order) {
+                this.$confirm('记得完成任务哦, 是否删除此条通知?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    index.fd = new FormData();
+                    index.fd.append("type", "delete");
+                    index.fd.append("id", tempRow.id);
+                    $.ajax({
+                        url: "/news",
+                        type: "POST",
+                        processData: false,
+                        contentType: false,
+                        data: index.fd,
+                        success: function (data1) {
+                            index.gridData.splice(order, 1);
+                        }
+                    })
+                }).catch(() => {
+                    this.$message({
+                        type: 'info',
+                        message: '已取消删除'
+                    });
+                });
+            },
+            goto(id, tempRow,order) {
+                index.fd = new FormData();
+                index.fd.append("type", "delete");
+                index.fd.append("id", tempRow.id);
+                $.ajax({
+                    url: "/news",
+                    type: "POST",
+                    processData: false,
+                    contentType: false,
+                    data: index.fd,
+                    success: function (data1) {
+                        index.gridData.splice(order, 1);
+                    }
+                })
+                document.getElementById(id).click();
+            },
+        }
+    })
+
+</script>
+
+
+</html>
